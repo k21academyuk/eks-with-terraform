@@ -15,7 +15,7 @@ data "aws_availability_zones" "available" {
 }
 
 locals {
-  cluster_name = "education-eks-${random_string.suffix.result}"
+  cluster_name = "k21-eks-cluster"
 }
 
 resource "random_string" "suffix" {
@@ -27,7 +27,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.8.1"
 
-  name = "education-vpc"
+  name = "k21-eks-vpc"
 
   cidr = "10.0.0.0/16"
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -53,7 +53,7 @@ module "eks" {
   version = "20.8.5"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.29"
+  cluster_version = "1.29"             // Enter latest version of Kubernetes
 
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
