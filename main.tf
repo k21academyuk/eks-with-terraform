@@ -1,12 +1,9 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
+# Define the AWS provider configuration with the specified region
 provider "aws" {
   region = var.region
 }
 
-# Filter out local zones, which are not currently supported 
-# with managed node groups
+# Retrieve available AWS availability zones data, filtering out local zones
 data "aws_availability_zones" "available" {
   filter {
     name   = "opt-in-status"
@@ -14,15 +11,18 @@ data "aws_availability_zones" "available" {
   }
 }
 
+# Define local variables
 locals {
   cluster_name = "k21-eks-cluster"
 }
 
+# Generate a random string of 8 characters
 resource "random_string" "suffix" {
   length  = 8
   special = false
 }
 
+# Create VPC using Terraform AWS VPC module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.8.1"
@@ -48,12 +48,13 @@ module "vpc" {
   }
 }
 
+# Create EKS cluster using Terraform AWS EKS module
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "20.8.5"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.29"             // Enter latest version of Kubernetes
+  cluster_version = "1.29"             # Enter latest version of Kubernetes
 
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
@@ -72,6 +73,7 @@ module "eks" {
 
   }
 
+  # Define managed node groups for the EKS cluster
   eks_managed_node_groups = {
     one = {
       name = "node-group-1"
@@ -95,12 +97,12 @@ module "eks" {
   }
 }
 
-
-# https://aws.amazon.com/blogs/containers/amazon-ebs-csi-driver-is-now-generally-available-in-amazon-eks-add-ons/ 
+# Retrieve AWS IAM policy data for EBS CSI driver
 data "aws_iam_policy" "ebs_csi_policy" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
+# Create IAM role for the EBS CSI driver using IAM module
 module "irsa-ebs-csi" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version = "5.39.0"
