@@ -48,7 +48,7 @@ module "eks" {
   version = "20.8.5"                          # Use version 20.8.5 of the module
 
   cluster_name    = local.cluster_name        # Name for the EKS cluster
-  cluster_version = "1.29"                    # Specify the Kubernetes version for the EKS cluster
+  cluster_version = "1.31"                    # Specify the Kubernetes version for the EKS cluster
 
   cluster_endpoint_public_access           = true  # Enable public access to the cluster endpoint
   enable_cluster_creator_admin_permissions = true  # Enable admin permissions for cluster creator
